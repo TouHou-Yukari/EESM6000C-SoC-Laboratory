@@ -138,7 +138,7 @@ module fir_tb
     initial begin
         axis_clk = 0;
         forever begin
-            #6 axis_clk = (~axis_clk);
+            #7 axis_clk = (~axis_clk);
         end
     end
 
