@@ -98,6 +98,8 @@ read_xdc /home/ubuntu/Desktop/Lab_3_fir/Lab_3_fir.srcs/constrs_1/new/constraints
 set_property used_in_implementation false [get_files /home/ubuntu/Desktop/Lab_3_fir/Lab_3_fir.srcs/constrs_1/new/constraints.xdc]
 
 set_param ips.enableIPCacheLiteLoad 1
+
+read_checkpoint -auto_incremental -incremental /home/ubuntu/Desktop/Lab_3_fir/Lab_3_fir.srcs/utils_1/imports/synth_1/fir.dcp
 close [open __synthesis_is_running__ w]
 
 OPTRACE "synth_design" START { }
