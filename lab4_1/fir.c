@@ -2,24 +2,25 @@
 
 void __attribute__ ( ( section ( ".mprjram" ) ) ) initfir() {
 	//initial your fir
-	for(int i=0; i<N; i=i+1){
-		inputbuffer[i] = 0;
-		outputsignal[i] = 0;
-	}
+	for (int i=0; i<N; i++) inputbuffer[i] = 0;
+	for (int i=0; i<N; i++) outputsignal[i] = 0;
 }
 
 int* __attribute__ ( ( section ( ".mprjram" ) ) ) fir(){
-	// initfir();
+	initfir();
 	//write down your fir
-	for(int idx = 0; idx < N ; idx ++){
-		for(int i=N-1; i > 0;i--){ // shift the data to be calculate in fir process
-			inputbuffer[i] = inputbuffer[i-1];
+	int sum;
+	int getData;
+	for (int i=0; i<N; i++) {
+	    sum = 0;
+		getData = inputsignal[i];
+		inputbuffer[i] = getData;
+		for (int j=0; j<i+1; j++) {
+			sum += inputbuffer[i-j] * taps[j];
 		}
-		inputbuffer[0] = inputsignal[idx];
-		for(int cnt = 0; cnt < N; cnt ++){ // fir mult
-			outputsignal[idx] += inputbuffer[cnt] * taps[cnt];
-		}
+		outputsignal[i] = sum;
 	}
 	
 	return outputsignal;
 }
+		

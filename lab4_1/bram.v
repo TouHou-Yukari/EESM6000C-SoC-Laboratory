@@ -14,10 +14,9 @@ module bram(
     output  reg     [31:0]  Do0;
     input   wire    [31:0]   A0;
 
-    // 16 kB
-    // parameter N = ;
-    parameter N = 10;
-    (* ram_style = "block" *) reg [31:0] RAM[0:2**N-1]; // 4byte * 
+    // 8 KB for the size of the .hex file is 7KB
+    parameter N = 11;
+    (* ram_style = "block" *) reg [31:0] RAM[0:2**N-1];
 
 
     always @(posedge CLK)
