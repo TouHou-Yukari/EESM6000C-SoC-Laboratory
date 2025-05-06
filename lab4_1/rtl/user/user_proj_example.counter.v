@@ -1,8 +1,3 @@
-
-
-// `default_nettype wire
-
-
 // SPDX-FileCopyrightText: 2020 Efabless Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +13,11 @@
 // limitations under the License.
 // SPDX-License-Identifier: Apache-2.0
 
-`default_nettype none
+`default_nettype wire
+
+`define MPRJ_IO_PADS_1 19	/* number of user GPIO pads on user1 side */
+`define MPRJ_IO_PADS_2 19	/* number of user GPIO pads on user2 side */
+`define MPRJ_IO_PADS (`MPRJ_IO_PADS_1 + `MPRJ_IO_PADS_2)
 /*
  *-------------------------------------------------------------
  *
@@ -74,6 +73,7 @@ module user_proj_example #(
     // IRQ
     output [2:0] irq
 );
+    
     wire clk;
     wire rst;
 
@@ -81,74 +81,69 @@ module user_proj_example #(
     wire [`MPRJ_IO_PADS-1:0] io_out;
     wire [`MPRJ_IO_PADS-1:0] io_oeb;
 
-    // wdata and rdata for bram
+
     wire [31:0] rdata; 
     wire [31:0] wdata;
     wire [BITS-1:0] count;
 
-    // set valid, ready and delay signal
     wire valid;
+    wire IsAddr;
     wire [3:0] wstrb;
     wire [31:0] la_write;
-    wire decoded;
 
     reg ready;
-    reg [BITS-17:0] delayed_count;
+    reg [31:0] delay_count;
 
+    assign IsAddr = (wbs_adr_i[31:20] == 12'h380) ? 1'b1 : 1'b0;
     // WB MI A
-    assign valid = wbs_cyc_i && wbs_stb_i && decoded; 
+    assign valid = wbs_cyc_i && wbs_stb_i && IsAddr;
     assign wstrb = wbs_sel_i & {4{wbs_we_i}};
     assign wbs_dat_o = rdata;
     assign wdata = wbs_dat_i;
     assign wbs_ack_o = ready;
 
     // IO
-    assign io_out = count;
-    assign io_oeb = {(`MPRJ_IO_PADS-1){rst}};
+    // assign io_out = count;
+    // assign io_oeb = {(`MPRJ_IO_PADS-1){rst}};
 
     // IRQ
-    assign irq = 3'b000;	// Unused
+    // assign irq = 3'b000;	// Unused
 
     // LA
-    assign la_data_out = {{(127-BITS){1'b0}}, count};
+    // assign la_data_out = {{(127-BITS){1'b0}}, count};
     // Assuming LA probes [63:32] are for controlling the count register  
-    assign la_write = ~la_oenb[63:32] & ~{BITS{valid}};
+    // assign la_write = ~la_oenb[63:32] & ~{BITS{valid}};
     // Assuming LA probes [65:64] are for controlling the count clk & reset  
     assign clk = (~la_oenb[64]) ? la_data_in[64]: wb_clk_i;
     assign rst = (~la_oenb[65]) ? la_data_in[65]: wb_rst_i;
-    // Decoded wishbone address
-    assign decoded = wbs_adr_i[31:20] == 12'h380 ? 1'b1: 1'b0;
 
+    // write a sequential logic that increments the count register until the value is eqaul to DELAYS
     always @(posedge clk) begin
         if (rst) begin
-            ready <= 1'b0;
-            delayed_count <= 16'b0;
+            delay_count <= 0;
+            ready <= 0;
         end else begin
-            ready <= 1'b0;
+            ready <= 0;
             if (valid && !ready) begin
-                if (delayed_count == DELAYS) begin
-                    delayed_count <= 16'b0;
-                    ready <= 1'b1;
+                if (delay_count == DELAYS) begin
+                    ready <= 1;
+                    delay_count <= 0;
                 end else begin
-                    delayed_count <= delayed_count + 1;
+                    delay_count <= delay_count + 1;
                 end
             end
-        end
+        end  
     end
-
-
 
     bram user_bram (
         .CLK(clk),
         .WE0(wstrb),
         .EN0(valid),
-        .Di0(wbs_dat_i),
+        .Di0(wdata),
         .Do0(rdata),
         .A0(wbs_adr_i)
     );
 
 endmodule
-
-
 
 `default_nettype wire
