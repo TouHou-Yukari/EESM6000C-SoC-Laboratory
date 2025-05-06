@@ -1,5 +1,5 @@
 # 0 "fir.c"
-# 1 "/home/ubuntu/lab-exmem_fir/testbench/counter_la_fir//"
+# 1 "/home/ubuntu/Lab4_1/testbench/counter_la_fir//"
 # 0 "<built-in>"
 # 0 "<command-line>"
 # 1 "fir.c"
@@ -17,23 +17,23 @@ int outputsignal[11];
 
 void __attribute__ ( ( section ( ".mprjram" ) ) ) initfir() {
 
- for(int i=0; i<11; i=i+1){
-  inputbuffer[i] = 0;
-  outputsignal[i] = 0;
- }
+ for (int i=0; i<11; i++) inputbuffer[i] = 0;
+ for (int i=0; i<11; i++) outputsignal[i] = 0;
 }
 
 int* __attribute__ ( ( section ( ".mprjram" ) ) ) fir(){
+ initfir();
 
-
- for(int idx = 0; idx < 11 ; idx ++){
-  for(int i=11 -1; i > 0;i--){
-   inputbuffer[i] = inputbuffer[i-1];
+ int sum;
+ int getData;
+ for (int i=0; i<11; i++) {
+     sum = 0;
+  getData = inputsignal[i];
+  inputbuffer[i] = getData;
+  for (int j=0; j<i+1; j++) {
+   sum += inputbuffer[i-j] * taps[j];
   }
-  inputbuffer[0] = inputsignal[idx];
-  for(int cnt = 0; cnt < 11; cnt ++){
-   outputsignal[idx] += inputbuffer[cnt] * taps[cnt];
-  }
+  outputsignal[i] = sum;
  }
 
  return outputsignal;

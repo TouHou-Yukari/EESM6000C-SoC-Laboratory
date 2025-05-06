@@ -6,7 +6,7 @@
 	.text
 .Ltext0:
 	.cfi_sections	.debug_frame
-	.file 0 "/home/ubuntu/lab-exmem_fir/testbench/counter_la_fir" "../../firmware/isr.c"
+	.file 0 "/home/ubuntu/Lab4_1/testbench/counter_la_fir" "../../firmware/isr.c"
 	.align	2
 	.type	flush_cpu_icache, @function
 flush_cpu_icache:
@@ -487,5 +487,5 @@ isr:
 .LASF0:
 	.string	"../../firmware/isr.c"
 .LASF1:
-	.string	"/home/ubuntu/lab-exmem_fir/testbench/counter_la_fir"
+	.string	"/home/ubuntu/Lab4_1/testbench/counter_la_fir"
 	.ident	"GCC: (g1ea978e3066) 12.1.0"
